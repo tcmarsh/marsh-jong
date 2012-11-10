@@ -1,5 +1,7 @@
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -15,7 +17,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 
 public class GamePanel extends JPanel implements MouseListener {
@@ -367,6 +371,11 @@ public class GamePanel extends JPanel implements MouseListener {
 		return removeTile(tile.xPos, tile.yPos, tile.zPos);
 	}
 	
+	/**
+	 * Performs an undo operation, returns false if the stack of previous
+	 * moves was empty
+	 * @return
+	 */
 	public boolean undo() {
 		try {
 			Tile tile1 = removedTiles.pop();
@@ -383,6 +392,9 @@ public class GamePanel extends JPanel implements MouseListener {
 		
 		return true;
 	}
+	/**
+	 * Performs a redo if any are available
+	 */
 	public void redo() {
 		try {
 			Tile tile1 = restoredTiles.pop();
@@ -393,7 +405,22 @@ public class GamePanel extends JPanel implements MouseListener {
 			System.err.println("No more redos");
 		}
 	}
+	/**
+	 * Hints a possible move
+	 * @param highlight a boolean indicating whether to highlight a move
+	 * @return a boolean indicating whether any moves are left
+	 */
 	public boolean hint(boolean highlight) {
+		return hint(highlight, false);
+	}
+	/**
+	 * Hints a possible move or the best possible found move
+	 * @param highlight a boolean indicating whether to highlight a move
+	 * @param bestMove a boolean indicating whether to look for the best
+	 * possible move
+	 * @return
+	 */
+	public boolean hint(boolean highlight, boolean bestMove) {
 		for (Tile tile: board.values()) {
 			if (!isOpen(tile)) {
 				continue;
@@ -495,6 +522,44 @@ public class GamePanel extends JPanel implements MouseListener {
 	public void mousePressed(MouseEvent e) {}
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		if (e.isPopupTrigger()) {
+			JPopupMenu popup = new JPopupMenu();
+			
+			JMenuItem menuItem = new JMenuItem("Undo");
+			if (!removedTiles.isEmpty()) {
+				menuItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						undo();
+					}
+				});
+			}
+			menuItem.setEnabled(!removedTiles.isEmpty());
+			popup.add(menuItem);
+			
+			menuItem = new JMenuItem("Redo");
+			if (!restoredTiles.isEmpty()) {
+				menuItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						redo();
+					}
+				});
+			}
+			menuItem.setEnabled(!restoredTiles.isEmpty());
+			popup.add(menuItem);
+			
+			popup.addSeparator();
+			
+			menuItem = new JMenuItem("Hint");
+			menuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					hint(true);
+				}
+			});
+			popup.add(menuItem);
+			
+			popup.show(this, e.getX(), e.getY());
+			return;
+		}
 		Object source = e.getSource();
 		if (source instanceof Tile && isOpen((Tile) source)) {
 			Tile tile = (Tile) source;

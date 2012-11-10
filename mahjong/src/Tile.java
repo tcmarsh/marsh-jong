@@ -59,8 +59,8 @@ abstract public class Tile extends JPanel implements Comparable<Tile> {
     	this.isSelected = isSelected;
     	revalidate();
     }
-    protected void hint(boolean isEnabled) {
-    	this.isHint = isEnabled;
+    protected void hint(boolean enableHint) {
+    	this.isHint = enableHint;
     	revalidate();
     }
 
