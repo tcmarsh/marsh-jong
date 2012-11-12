@@ -69,7 +69,7 @@ public class GamePanel extends JPanel implements MouseListener {
 	 * @param height the integer height of the game board
 	 * @param drawRound a boolean indicating whether to draw round corners
 	 */
-	private void initialize(int width, int height, boolean drawRound) {
+	protected void initialize(int width, int height, boolean drawRound) {
 		setLayout(null);
 		setSize(width, height);
 
@@ -235,7 +235,7 @@ public class GamePanel extends JPanel implements MouseListener {
 	private List<Tile> initializeDeck(Boolean drawRound) {
 		List<Tile> deck = new ArrayList<Tile>();
 		
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 2; i++) {
 			
 			// Chinese numbers
 			deck.add(new CharacterTile('1'));
@@ -570,13 +570,19 @@ public class GamePanel extends JPanel implements MouseListener {
 				selectedTile.highlight(false);
 				removeTile(selectedTile);
 				if (!hint(false)) {
-					System.err.println("No more matches!");
+					((MahjongBoard) getTopLevelAncestor()).checkEndGame();
 				}
 				selectedTile = null;
 			}
-			else if (selectedTile != null) {
+			else if (selectedTile == tile) {
 				selectedTile.highlight(false);
 				selectedTile = null;
+				repaint();
+			}
+			else if (selectedTile != null) {
+				selectedTile.highlight(false);
+				selectedTile = tile;
+				tile.highlight(true);
 				repaint();
 			}
 			else {
@@ -591,12 +597,6 @@ public class GamePanel extends JPanel implements MouseListener {
 				selectedTile = null;
 				repaint();
 			}
-			else {
-				hint(true);
-			}
-//			else if (!undo()) {
-//				redo();
-//			}
 		}
 	}
 }

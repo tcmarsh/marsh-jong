@@ -28,7 +28,7 @@ abstract public class Tile extends JPanel implements Comparable<Tile> {
 	protected final Color WHITE = Color.WHITE;
 	protected final Color IVORY = new Color(245, 245, 214);
 	protected final Color LIGHT_GRAY = Color.LIGHT_GRAY;
-	protected final Color LILAC = new Color(255, 225, 255);
+	protected final Color LILAC = new Color(255, 185, 255);
 	protected final Color HIGHLIGHT = LILAC;
 	protected final Color HINT = GREEN;
 	
