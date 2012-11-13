@@ -34,8 +34,10 @@ public class MahjongBoard extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		setSize(WIDTH, HEIGHT);
+		setLayout(new BorderLayout());
 		
-		gamePanel = new GamePanel(WIDTH - 10, HEIGHT - 10, true);
+		gamePanel = new GamePanel(getContentPane().getWidth(), 
+				getContentPane().getHeight(), true);
 
 		JMenuBar menubar = new JMenuBar();
 		JMenu menu = new JMenu("File");
@@ -173,7 +175,8 @@ public class MahjongBoard extends JFrame {
 		item.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				setSize(WIDTH + 200, HEIGHT);
+				setSize(WIDTH + Tile.WIDTH * 3, 
+						getContentPane().getHeight());
 				JPanel removedPanel = new JPanel();
 				gamePanel.populateRemoved(removedPanel);
 				
@@ -248,7 +251,8 @@ public class MahjongBoard extends JFrame {
 	private void newGame() {
 		remove(gamePanel);
 		
-		gamePanel = new GamePanel(WIDTH - 10, HEIGHT - 10, true);
+		gamePanel = new GamePanel(getContentPane().getWidth(), 
+				getContentPane().getHeight(), true);
 		add(gamePanel);
 
 		checkEnabledMenus();

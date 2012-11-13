@@ -12,7 +12,7 @@ public class CharacterTile extends Tile {
 	protected char symbol;
 	
 	static {
-		symbols = new HashMap<>();
+		symbols = new HashMap<Character, String>();
 		symbols.put('1', "\u4E00");
 		symbols.put('2', "\u4E8C");
 		symbols.put('3', "\u4E09");
@@ -30,7 +30,7 @@ public class CharacterTile extends Tile {
 		symbols.put('F', "\u767C");
 		symbols.put('w', "\u842C");
 		
-		symbolNames = new HashMap<>();
+		symbolNames = new HashMap<Character, String>();
 		for (int i = 1; i < 10; i++) {
 			symbolNames.put(Character.forDigit(i, 10), "Character " + i);
 		}

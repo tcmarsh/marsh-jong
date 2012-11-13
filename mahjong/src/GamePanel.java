@@ -546,8 +546,8 @@ public class GamePanel extends JPanel implements MouseListener {
 	}
 	
 	protected void populateRemoved(JPanel removedPanel) {
-		removedPanel.setPreferredSize(new Dimension(200, 
-				removedTiles.size() * Tile.HEIGHT / 2));
+		removedPanel.setPreferredSize(new Dimension(WIDTH + Tile.WIDTH * 3, 
+				removedTiles.size() * (int) (Tile.HEIGHT / 1.5)));
 		removedPanel.setLayout(new GridLayout(removedTiles.size() / 2, 2));
 		
 
