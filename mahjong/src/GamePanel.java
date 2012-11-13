@@ -1,4 +1,6 @@
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -235,7 +237,7 @@ public class GamePanel extends JPanel implements MouseListener {
 	private List<Tile> initializeDeck(Boolean drawRound) {
 		List<Tile> deck = new ArrayList<Tile>();
 		
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 4; i++) {
 			
 			// Chinese numbers
 			deck.add(new CharacterTile('1'));
@@ -302,6 +304,18 @@ public class GamePanel extends JPanel implements MouseListener {
 		}
 		
 		return deck;
+	}
+	
+	protected void toggleRoundedCorners() {
+		for (Tile tile: board.values()) {
+			tile.drawRound = !tile.drawRound;
+		}
+		Stack<Tile> tempStack = removedTiles;
+		for (Tile tile: tempStack) {
+			tile.drawRound = !tile.drawRound;
+		}
+		
+		repaint();
 	}
 	
 	/**
@@ -390,6 +404,8 @@ public class GamePanel extends JPanel implements MouseListener {
 			return false;
 		}
 		
+		((MahjongBoard) getTopLevelAncestor()).checkEnabledMenus();
+
 		return true;
 	}
 	/**
@@ -401,6 +417,9 @@ public class GamePanel extends JPanel implements MouseListener {
 			Tile tile2 = restoredTiles.pop();
 			removeTile(tile1);
 			removeTile(tile2);
+
+			((MahjongBoard) getTopLevelAncestor()).checkEnabledMenus();
+
 		} catch (EmptyStackException e) {
 			System.err.println("No more redos");
 		}
@@ -511,7 +530,32 @@ public class GamePanel extends JPanel implements MouseListener {
 		
 		return isOpen(tile.xPos, tile.yPos, tile.zPos);
 	}
+	/**
+	 * Returns true if there are any moves available to redo
+	 * @return
+	 */
+	public boolean canRedo() {
+		return !restoredTiles.isEmpty();
+	}
+	/**
+	 * Returns true if there are any moves to undo
+	 * @return
+	 */
+	public boolean canUndo() {
+		return !removedTiles.isEmpty();
+	}
+	
+	protected void populateRemoved(JPanel removedPanel) {
+		removedPanel.setPreferredSize(new Dimension(200, 
+				removedTiles.size() * Tile.HEIGHT / 2));
+		removedPanel.setLayout(new GridLayout(removedTiles.size() / 2, 2));
+		
 
+		for (Tile tile: removedTiles) {
+			removedPanel.add(tile);
+		}
+	}
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {}
 	@Override
@@ -522,29 +566,29 @@ public class GamePanel extends JPanel implements MouseListener {
 	public void mousePressed(MouseEvent e) {}
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if (e.isPopupTrigger()) {
+		if (e.isPopupTrigger() && !(e.getSource() instanceof Tile)) {
 			JPopupMenu popup = new JPopupMenu();
 			
 			JMenuItem menuItem = new JMenuItem("Undo");
-			if (!removedTiles.isEmpty()) {
+			if (canUndo()) {
 				menuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						undo();
 					}
 				});
 			}
-			menuItem.setEnabled(!removedTiles.isEmpty());
+			menuItem.setEnabled(canUndo());
 			popup.add(menuItem);
 			
 			menuItem = new JMenuItem("Redo");
-			if (!restoredTiles.isEmpty()) {
+			if (canRedo()) {
 				menuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						redo();
 					}
 				});
 			}
-			menuItem.setEnabled(!restoredTiles.isEmpty());
+			menuItem.setEnabled(canRedo());
 			popup.add(menuItem);
 			
 			popup.addSeparator();
@@ -560,6 +604,9 @@ public class GamePanel extends JPanel implements MouseListener {
 			popup.show(this, e.getX(), e.getY());
 			return;
 		}
+		else if (e.isPopupTrigger()) {
+			return;
+		}
 		Object source = e.getSource();
 		if (source instanceof Tile && isOpen((Tile) source)) {
 			Tile tile = (Tile) source;
@@ -569,6 +616,7 @@ public class GamePanel extends JPanel implements MouseListener {
 				removeTile(tile);
 				selectedTile.highlight(false);
 				removeTile(selectedTile);
+				((MahjongBoard) getTopLevelAncestor()).checkEnabledMenus();
 				if (!hint(false)) {
 					((MahjongBoard) getTopLevelAncestor()).checkEndGame();
 				}
