@@ -1,6 +1,4 @@
-import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,7 +26,7 @@ public class GamePanel extends JPanel implements MouseListener {
 	private static final long serialVersionUID = -3289466134158240778L;
 
 	private static final long RANDOM_CONSTANT = new Date().getTime();
-	private static Random random = new Random(RANDOM_CONSTANT);
+	private static Random random;
 	private Map<String, Tile> board = new HashMap<String, Tile>();
 	private Stack<Tile> removedTiles = new Stack<Tile>();
 	private Stack<Tile> restoredTiles = new Stack<Tile>();
@@ -37,12 +35,23 @@ public class GamePanel extends JPanel implements MouseListener {
 									"yin-yang-dragon.jpg", "yin-yang-white-dragon.jpg"};
 	private String backgroundString;
 	
+	protected long gameNumber;
+	
 	private Tile selectedTile;
 
 	public GamePanel(int width, int height) {
-		initialize(width, height, true);
+		this(width, height, true);
 	}
 	public GamePanel(int width, int height, boolean drawRound) {
+		this(width, height, drawRound, RANDOM_CONSTANT % 1000000);
+	}
+	public GamePanel(int width, int height, long randomNumber) {
+		this(width, height, true, randomNumber);
+	}
+	public GamePanel(int width, int height, boolean drawRound, 
+			long randomNumber) {
+		gameNumber = randomNumber;
+		random = new Random(randomNumber);
 		initialize(width, height, drawRound);
 	}
 	
@@ -317,6 +326,15 @@ public class GamePanel extends JPanel implements MouseListener {
 		
 		repaint();
 	}
+	protected boolean hasRoundedCorners() {
+		if (board.values() != null && board.values().size() > 0) {
+			for (Tile tile: board.values()) {
+				return tile.drawRound;
+			}
+		}
+		
+		return false;
+	}
 	
 	/**
 	 * Draws the tiles on the board 
@@ -543,17 +561,6 @@ public class GamePanel extends JPanel implements MouseListener {
 	 */
 	public boolean canUndo() {
 		return !removedTiles.isEmpty();
-	}
-	
-	protected void populateRemoved(JPanel removedPanel) {
-		removedPanel.setPreferredSize(new Dimension(WIDTH + Tile.WIDTH * 3, 
-				removedTiles.size() * (int) (Tile.HEIGHT / 1.5)));
-		removedPanel.setLayout(new GridLayout(removedTiles.size() / 2, 2));
-		
-
-		for (Tile tile: removedTiles) {
-			removedPanel.add(tile);
-		}
 	}
 	
 	@Override

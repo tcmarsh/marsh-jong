@@ -24,11 +24,13 @@ public class MahjongBoard extends JFrame {
 	private GamePanel gamePanel;
 	
 	// File has New game, then a separator before these items
-	private final int UNDO_INDEX = 3;
+	private final int UNDO_INDEX = 4;
 	private final int REDO_INDEX = UNDO_INDEX + 1;
 	private final int HINT_INDEX = REDO_INDEX + 1;
 	// Save menu item is after a separator
 	private final int SAVE_INDEX = HINT_INDEX + 2;
+	
+	private final String title = "Marsh-jong: \t";
 	
 	public MahjongBoard() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -53,7 +55,7 @@ public class MahjongBoard extends JFrame {
 						"Abandon current game and start a new one?",
 						"New Game",
 						JOptionPane.YES_NO_OPTION
-						); 
+						);
 				if (selection == 0) {
 					newGame();
 				}
@@ -68,14 +70,31 @@ public class MahjongBoard extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String number = JOptionPane.showInputDialog(
 						"Enter the game number");
-				if (Helper.isInteger(number) && number.length() == 5) {
-					System.out.println(number);
+				if (Helper.isInteger(number) && number.length() == 6) {
+					newGame(Long.parseLong(number));
 				}
 				else if (number != null) {
 					JOptionPane.showMessageDialog((JMenuItem) e.getSource(), 
-							"Invalid input, must be a five-digit number",
+							"Invalid input, must be a six-digit number",
 							"Bad Game Number",
 							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		menu.add(item);
+		
+		item = new JMenuItem("Restart");
+		item.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int selection = JOptionPane.showConfirmDialog(
+						(JMenuItem) e.getSource(), 
+						"Abandon current game and restart?",
+						"New Game",
+						JOptionPane.YES_NO_OPTION
+						);
+				if (selection == 0) {
+					newGame(gamePanel.gameNumber);
 				}
 			}
 		});
@@ -175,12 +194,6 @@ public class MahjongBoard extends JFrame {
 		item.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				setSize(WIDTH + Tile.WIDTH * 3, 
-						getContentPane().getHeight());
-				JPanel removedPanel = new JPanel();
-				gamePanel.populateRemoved(removedPanel);
-				
-				add(new JScrollPane(removedPanel), BorderLayout.EAST);
 			}
 		});
 		menu.add(item);
@@ -204,7 +217,7 @@ public class MahjongBoard extends JFrame {
 			}
 		});
 		
-		setTitle("Marsh-jong");
+		setTitle(title + gamePanel.gameNumber);
 		setResizable(false);
 		setVisible(true);
 	}
@@ -249,14 +262,27 @@ public class MahjongBoard extends JFrame {
 		Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(event);
 	}
 	private void newGame() {
+		newGame(null);
+	}
+	private void newGame(Long randomNumber) {
+		boolean roundedCorners = gamePanel.hasRoundedCorners();
 		remove(gamePanel);
 		
-		gamePanel = new GamePanel(getContentPane().getWidth(), 
-				getContentPane().getHeight(), true);
+		int width = getContentPane().getWidth();
+		int height = getContentPane().getHeight();
+		
+		if (randomNumber == null) {
+			gamePanel = new GamePanel(width, height, roundedCorners);
+		}
+		else {
+			gamePanel = new GamePanel(width, height, roundedCorners, randomNumber);
+		}
+		
 		add(gamePanel);
 
 		checkEnabledMenus();
 
+		setTitle(title + gamePanel.gameNumber);
 		repaint();
 	}
 	
