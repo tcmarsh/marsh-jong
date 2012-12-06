@@ -1,6 +1,7 @@
 
 
 
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -21,6 +22,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
@@ -42,6 +44,7 @@ public class GamePanel extends JPanel implements MouseListener {
 	private boolean sound = true;
 	private PlayClip playClip = new PlayClip("sounds/stone-scraping.wav");
 	private Fireworks fireworks = null;
+	private boolean initHint = false;
 
 	public GamePanel(int width, int height) {
 		this(width, height, true);
@@ -688,7 +691,9 @@ public class GamePanel extends JPanel implements MouseListener {
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					hint(true);
+					if (allowHint(((JMenuItem) e.getSource()).getTopLevelAncestor())) {
+						hint(true);
+					}
 				}
 			});
 			popup.add(menuItem);
@@ -756,5 +761,20 @@ public class GamePanel extends JPanel implements MouseListener {
 			}
 		}
 		return removedPanel;
+	}
+	
+	protected boolean allowHint(Container parent) {
+		if (!initHint) {
+			int selection = JOptionPane.showConfirmDialog(parent,
+					"If you use a hint, you will not be eligible for high scores. Continue?",
+					"Use Hints?", JOptionPane.YES_NO_OPTION);
+			if (selection == 0) {
+				initHint = true;
+			}
+			return initHint;
+		}
+		else {
+			return initHint;
+		}
 	}
 }

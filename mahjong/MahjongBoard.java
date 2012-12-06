@@ -49,6 +49,7 @@ public class MahjongBoard extends JFrame {
 		item.setMnemonic(KeyEvent.VK_N);
 		item.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_N, KeyEvent.CTRL_MASK));
+		item.setToolTipText("Begins a new, random game.");
 		item.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -67,6 +68,7 @@ public class MahjongBoard extends JFrame {
 
 		item = new JMenuItem("New Numbered Game");
 		item.setMnemonic(KeyEvent.VK_G);
+		item.setToolTipText("Begins a new game given a game number.");
 		item.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -86,6 +88,7 @@ public class MahjongBoard extends JFrame {
 		menu.add(item);
 
 		item = new JMenuItem("Restart");
+		item.setToolTipText("Restarts the current game and clears the undo/redo actions.");
 		item.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -132,10 +135,13 @@ public class MahjongBoard extends JFrame {
 
 		item = new JMenuItem("Hint");
 		item.setMnemonic(KeyEvent.VK_H);
+		item.setToolTipText("Highlights a possible move.");
 		item.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				gamePanel.hint(true);
+				if (gamePanel.allowHint(((JMenuItem) e.getSource()).getTopLevelAncestor())) {
+					gamePanel.hint(true);
+				}
 			}
 		});
 		menu.add(item, HINT_INDEX);
@@ -146,6 +152,8 @@ public class MahjongBoard extends JFrame {
 		item.setMnemonic(KeyEvent.VK_S);
 		item.setAccelerator(KeyStroke.getKeyStroke(
 				KeyEvent.VK_S, KeyEvent.CTRL_MASK));
+		item.setToolTipText("Not implemented - keep track of the game number to replay this game for now.");
+		item.setEnabled(false);
 		item.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -156,6 +164,7 @@ public class MahjongBoard extends JFrame {
 		menu.add(item, SAVE_INDEX);
 
 		item = new JMenuItem("Exit Game");
+		item.setToolTipText("Exits the game. To continue from the current game state, use Save Game first.");
 		item.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
