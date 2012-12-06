@@ -1,3 +1,5 @@
+
+
 abstract public class RankTile extends Tile {
 	private static final long serialVersionUID = 5395999951247516100L;
 

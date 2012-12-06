@@ -1,4 +1,6 @@
 
+
+
 import java.awt.Graphics;
 import java.awt.Image;
 
@@ -19,7 +21,7 @@ abstract public class PictureTile extends Tile{
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		ImageIcon image = new ImageIcon(getClass().getResource(name + ".png"));
+		ImageIcon image = new ImageIcon(getClass().getResource("images/" + name + ".png"));
 		image = new ImageIcon(
 				image.getImage().getScaledInstance(
 						(int) (image.getIconWidth() * .8), 

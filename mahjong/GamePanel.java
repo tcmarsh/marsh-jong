@@ -1,4 +1,6 @@
 
+
+
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -39,6 +41,7 @@ public class GamePanel extends JPanel implements MouseListener {
 	protected long gameNumber;
 	private Tile selectedTile;
 	private boolean init = true;
+	private PlayClip playClip = new PlayClip("sounds/stone-scraping.wav");
 
 	public GamePanel(int width, int height) {
 		this(width, height, true);
@@ -62,6 +65,7 @@ public class GamePanel extends JPanel implements MouseListener {
 		initialize(width, height, drawRound);
 	}
 
+	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
@@ -92,7 +96,7 @@ public class GamePanel extends JPanel implements MouseListener {
 		setSize(width, height);
 
 		int number = random.nextInt(backgrounds.length);
-		backgroundString = backgrounds[number];
+		backgroundString = "images/" + backgrounds[number];
 
 		List<Tile> deck = initializeDeck(drawRound);
 
@@ -244,53 +248,54 @@ public class GamePanel extends JPanel implements MouseListener {
 	 * @return
 	 */
 	private List<Tile> initializeDeck(Boolean drawRound) {
-		List<Tile> deck = new ArrayList<Tile>();
+		List<Tile> deck = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
 
 			// Chinese numbers
 			deck.add(new CharacterTile('1'));
-			deck.add(new CharacterTile('2'));
-			deck.add(new CharacterTile('3'));
-			deck.add(new CharacterTile('4'));
-			deck.add(new CharacterTile('5'));
-			deck.add(new CharacterTile('6'));
-			deck.add(new CharacterTile('7'));
-			deck.add(new CharacterTile('8'));
-			deck.add(new CharacterTile('9'));
-
-			// Wind tiles
-			deck.add(new CharacterTile('N'));
-			deck.add(new CharacterTile('S'));
-			deck.add(new CharacterTile('E'));
-			deck.add(new CharacterTile('W'));
-
-			// Dragon tiles
-			deck.add(new CharacterTile('C'));
-			deck.add(new CharacterTile('F'));
-			deck.add(new WhiteDragonTile());
-
-			// Bamboo tiles, including the bamboo 1 picture
-			deck.add(new Bamboo1Tile());
-			deck.add(new BambooTile(2));
-			deck.add(new BambooTile(3));
-			deck.add(new BambooTile(4));
-			deck.add(new BambooTile(5));
-			deck.add(new BambooTile(6));
-			deck.add(new BambooTile(7));
-			deck.add(new BambooTile(8));
-			deck.add(new BambooTile(9));
-
-			// Circle tiles, including the 'pancake'
-			deck.add(new CircleTile(1));
-			deck.add(new CircleTile(2));
-			deck.add(new CircleTile(3));
-			deck.add(new CircleTile(4));
-			deck.add(new CircleTile(5));
-			deck.add(new CircleTile(6));
-			deck.add(new CircleTile(7));
-			deck.add(new CircleTile(8));
-			deck.add(new CircleTile(9));
+			continue;
+//			deck.add(new CharacterTile('2'));
+//			deck.add(new CharacterTile('3'));
+//			deck.add(new CharacterTile('4'));
+//			deck.add(new CharacterTile('5'));
+//			deck.add(new CharacterTile('6'));
+//			deck.add(new CharacterTile('7'));
+//			deck.add(new CharacterTile('8'));
+//			deck.add(new CharacterTile('9'));
+//
+//			// Wind tiles
+//			deck.add(new CharacterTile('N'));
+//			deck.add(new CharacterTile('S'));
+//			deck.add(new CharacterTile('E'));
+//			deck.add(new CharacterTile('W'));
+//
+//			// Dragon tiles
+//			deck.add(new CharacterTile('C'));
+//			deck.add(new CharacterTile('F'));
+//			deck.add(new WhiteDragonTile());
+//
+//			// Bamboo tiles, including the bamboo 1 picture
+//			deck.add(new Bamboo1Tile());
+//			deck.add(new BambooTile(2));
+//			deck.add(new BambooTile(3));
+//			deck.add(new BambooTile(4));
+//			deck.add(new BambooTile(5));
+//			deck.add(new BambooTile(6));
+//			deck.add(new BambooTile(7));
+//			deck.add(new BambooTile(8));
+//			deck.add(new BambooTile(9));
+//
+//			// Circle tiles, including the 'pancake'
+//			deck.add(new CircleTile(1));
+//			deck.add(new CircleTile(2));
+//			deck.add(new CircleTile(3));
+//			deck.add(new CircleTile(4));
+//			deck.add(new CircleTile(5));
+//			deck.add(new CircleTile(6));
+//			deck.add(new CircleTile(7));
+//			deck.add(new CircleTile(8));
+//			deck.add(new CircleTile(9));
 
 		}
 
@@ -392,7 +397,7 @@ public class GamePanel extends JPanel implements MouseListener {
 		if (tile == null) {
 			System.err.println("The tile didn't exist, who did this!?");
 		} else {
-//			tile.removeMouseListener(this);
+			playClip.play();
 			tile.isDirty = true;
 			removedTiles.push(tile);
 			remove(tile);
@@ -659,6 +664,10 @@ public class GamePanel extends JPanel implements MouseListener {
 				selectedTile.highlight(false);
 				removeTile(selectedTile);
 				((MahjongBoard) getTopLevelAncestor()).checkEnabledMenus();
+				if (board.size() == 0) {
+					Fireworks fireworks = new Fireworks(this);
+					fireworks.fire();
+				}
 				if (!hint(false)) {
 					((MahjongBoard) getTopLevelAncestor()).checkEndGame();
 				}

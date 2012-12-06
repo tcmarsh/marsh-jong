@@ -1,3 +1,5 @@
+
+
 public class Bamboo1Tile extends PictureTile {
 	private static final long serialVersionUID = -256268073564686530L;
 
