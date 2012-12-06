@@ -1,5 +1,3 @@
-
-
 import	static	java.lang.Math.*;
 import	java.util.*;
 import	java.awt.*;
@@ -192,7 +190,7 @@ public class Fireworks implements Runnable
 
 	public class StarBurst implements Runnable
 	{
-		private	PlayClip	explosion = new PlayClip("audio/explosion.wav");
+		private	PlayClip	explosion = new PlayClip("sounds/explosion.wav");
 		private	int		r = rand.nextInt(50) + 50;
 		private	Color		color = colors[rand.nextInt(colors.length)];
 		private	double		theta = PI * (rand.nextInt(30) + 75) / 180;
