@@ -19,21 +19,18 @@ import java.util.Random;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 
 public class GamePanel extends JPanel implements MouseListener {
 
 	private static final long serialVersionUID = -3289466134158240778L;
-	private static final long RANDOM_CONSTANT = new Date().getTime();
 	private static Random random;
-	private Map<String, Tile> board = new HashMap<String, Tile>();
-	private Stack<Tile> removedTiles = new Stack<Tile>();
-	private Stack<Tile> restoredTiles = new Stack<Tile>();
+	private Map<String, Tile> board = new HashMap<>();
+	private Stack<Tile> removedTiles = new Stack<>();
+	private Stack<Tile> restoredTiles = new Stack<>();
 	private String[] backgrounds = {"dragon.png", "dragon_bg.png", "blue-dragon.jpg",
 		"red-gold-dragon.jpg", "red-silver-dragon.jpg",
 		"yin-yang-dragon.jpg", "yin-yang-white-dragon.jpg"};
@@ -105,7 +102,7 @@ public class GamePanel extends JPanel implements MouseListener {
 	 * @param height the integer height of the game board
 	 * @param drawRound a boolean indicating whether to draw round corners
 	 */
-	protected void initialize(int width, int height, boolean drawRound) {
+	private void initialize(int width, int height, boolean drawRound) {
 		setLayout(null);
 		setSize(width, height);
 
@@ -359,7 +356,7 @@ public class GamePanel extends JPanel implements MouseListener {
 	 * Draws the tiles on the board
 	 */
 	private void redraw() {
-		List<Tile> deck = new ArrayList<Tile>();
+		List<Tile> deck = new ArrayList<>();
 		deck.addAll(board.values());
 		Collections.sort(deck);
 
@@ -664,6 +661,7 @@ public class GamePanel extends JPanel implements MouseListener {
 			JMenuItem menuItem = new JMenuItem("Undo");
 			if (canUndo()) {
 				menuItem.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						undo();
 					}
@@ -675,6 +673,7 @@ public class GamePanel extends JPanel implements MouseListener {
 			menuItem = new JMenuItem("Redo");
 			if (canRedo()) {
 				menuItem.addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent e) {
 						redo();
 					}
@@ -687,6 +686,7 @@ public class GamePanel extends JPanel implements MouseListener {
 
 			menuItem = new JMenuItem("Hint");
 			menuItem.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					hint(true);
 				}
@@ -708,7 +708,7 @@ public class GamePanel extends JPanel implements MouseListener {
 				selectedTile.highlight(false);
 				removeTile(selectedTile);
 				((MahjongBoard) getTopLevelAncestor()).checkEnabledMenus();
-				if (board.size() == 0) {
+				if (board.isEmpty()) {
 					fireworks = new Fireworks(this);
 					fireworks.setSound(sound);
 					fireworks.fire();

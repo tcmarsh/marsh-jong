@@ -6,13 +6,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JCheckBoxMenuItem;
-
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
@@ -20,8 +18,8 @@ import javax.swing.KeyStroke;
 public class MahjongBoard extends JFrame {
 	private static final long serialVersionUID = -8006300036685327355L;
 
-	private static final int WIDTH = 1100;
-	private static final int HEIGHT = 800;
+	private static final int BOARD_WIDTH = 1100;
+	private static final int BOARD_HEIGHT = 800;
 	private GamePanel gamePanel;
 
 	// File has New game, then a separator before these items
@@ -39,7 +37,7 @@ public class MahjongBoard extends JFrame {
 	public MahjongBoard() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		setSize(WIDTH, HEIGHT);
+		setSize(BOARD_WIDTH, BOARD_HEIGHT);
 		setLayout(new BorderLayout());
 
 		gamePanel = new GamePanel(getContentPane().getWidth(),
@@ -230,6 +228,7 @@ public class MahjongBoard extends JFrame {
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent e) {
 				int selection =
 						JOptionPane.showConfirmDialog(e.getComponent(),
@@ -252,6 +251,7 @@ public class MahjongBoard extends JFrame {
 		JScrollPane scrollPane = new JScrollPane(gamePanel.getRemovedPanel());
 		removedFrame.add(scrollPane);
 		removedFrame.addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent e) {
 				removedTilesItem.setEnabled(true);
 			}
@@ -324,7 +324,7 @@ public class MahjongBoard extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		new MahjongBoard();
+		MahjongBoard mahjongBoard = new MahjongBoard();
 	}
 
 }
