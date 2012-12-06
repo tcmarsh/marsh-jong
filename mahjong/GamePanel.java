@@ -40,8 +40,11 @@ public class GamePanel extends JPanel implements MouseListener {
 	private String backgroundString;
 	protected long gameNumber;
 	private Tile selectedTile;
+	private JPanel removedPanel = null;
 	private boolean init = true;
+	private boolean sound = true;
 	private PlayClip playClip = new PlayClip("sounds/stone-scraping.wav");
+	private Fireworks fireworks = null;
 
 	public GamePanel(int width, int height) {
 		this(width, height, true);
@@ -63,6 +66,17 @@ public class GamePanel extends JPanel implements MouseListener {
 		gameNumber = randomNumber;
 		random = new Random(randomNumber);
 		initialize(width, height, drawRound);
+	}
+
+	protected boolean getSound() {
+		return sound;
+	}
+	protected void setSound(boolean sound) {
+		this.sound = sound;
+	}
+
+	protected int getRemovedTileCount() {
+		return removedTiles.size();
 	}
 
 	@Override
@@ -254,48 +268,47 @@ public class GamePanel extends JPanel implements MouseListener {
 
 			// Chinese numbers
 			deck.add(new CharacterTile('1'));
-			continue;
-//			deck.add(new CharacterTile('2'));
-//			deck.add(new CharacterTile('3'));
-//			deck.add(new CharacterTile('4'));
-//			deck.add(new CharacterTile('5'));
-//			deck.add(new CharacterTile('6'));
-//			deck.add(new CharacterTile('7'));
-//			deck.add(new CharacterTile('8'));
-//			deck.add(new CharacterTile('9'));
-//
-//			// Wind tiles
-//			deck.add(new CharacterTile('N'));
-//			deck.add(new CharacterTile('S'));
-//			deck.add(new CharacterTile('E'));
-//			deck.add(new CharacterTile('W'));
-//
-//			// Dragon tiles
-//			deck.add(new CharacterTile('C'));
-//			deck.add(new CharacterTile('F'));
-//			deck.add(new WhiteDragonTile());
-//
-//			// Bamboo tiles, including the bamboo 1 picture
-//			deck.add(new Bamboo1Tile());
-//			deck.add(new BambooTile(2));
-//			deck.add(new BambooTile(3));
-//			deck.add(new BambooTile(4));
-//			deck.add(new BambooTile(5));
-//			deck.add(new BambooTile(6));
-//			deck.add(new BambooTile(7));
-//			deck.add(new BambooTile(8));
-//			deck.add(new BambooTile(9));
-//
-//			// Circle tiles, including the 'pancake'
-//			deck.add(new CircleTile(1));
-//			deck.add(new CircleTile(2));
-//			deck.add(new CircleTile(3));
-//			deck.add(new CircleTile(4));
-//			deck.add(new CircleTile(5));
-//			deck.add(new CircleTile(6));
-//			deck.add(new CircleTile(7));
-//			deck.add(new CircleTile(8));
-//			deck.add(new CircleTile(9));
+			deck.add(new CharacterTile('2'));
+			deck.add(new CharacterTile('3'));
+			deck.add(new CharacterTile('4'));
+			deck.add(new CharacterTile('5'));
+			deck.add(new CharacterTile('6'));
+			deck.add(new CharacterTile('7'));
+			deck.add(new CharacterTile('8'));
+			deck.add(new CharacterTile('9'));
+
+			// Wind tiles
+			deck.add(new CharacterTile('N'));
+			deck.add(new CharacterTile('S'));
+			deck.add(new CharacterTile('E'));
+			deck.add(new CharacterTile('W'));
+
+			// Dragon tiles
+			deck.add(new CharacterTile('C'));
+			deck.add(new CharacterTile('F'));
+			deck.add(new WhiteDragonTile());
+
+			// Bamboo tiles, including the bamboo 1 picture
+			deck.add(new Bamboo1Tile());
+			deck.add(new BambooTile(2));
+			deck.add(new BambooTile(3));
+			deck.add(new BambooTile(4));
+			deck.add(new BambooTile(5));
+			deck.add(new BambooTile(6));
+			deck.add(new BambooTile(7));
+			deck.add(new BambooTile(8));
+			deck.add(new BambooTile(9));
+
+			// Circle tiles, including the 'pancake'
+			deck.add(new CircleTile(1));
+			deck.add(new CircleTile(2));
+			deck.add(new CircleTile(3));
+			deck.add(new CircleTile(4));
+			deck.add(new CircleTile(5));
+			deck.add(new CircleTile(6));
+			deck.add(new CircleTile(7));
+			deck.add(new CircleTile(8));
+			deck.add(new CircleTile(9));
 
 		}
 
@@ -394,19 +407,40 @@ public class GamePanel extends JPanel implements MouseListener {
 	 */
 	public Tile removeTile(int xPos, int yPos, int zPos) {
 		Tile tile = board.remove(getKey(xPos, yPos, zPos));
+		int stackSize = removedTiles.size();
 		if (tile == null) {
 			System.err.println("The tile didn't exist, who did this!?");
 		} else {
-			playClip.play();
+			if (sound) {
+				playClip.play();
+			}
 			tile.isDirty = true;
 			removedTiles.push(tile);
 			remove(tile);
 			redraw();
 			repaint();
 		}
+		if (stackSize % 2 != 0 && removedTiles.size() > stackSize && removedPanel != null) {
+			removedPanel.removeAll();
+			for (Tile t: removedTiles) {
+				removedPanel.add(t, 0);
+			}
+			resizeRemovedFrame();
+			removedPanel.revalidate();
+		}
 		return tile;
 	}
 
+	protected void resizeRemovedFrame() {
+			int height = getRemovedTileCount() * (Tile.HEIGHT + 120 / getRemovedTileCount()) / 2 + 50;
+			height = height < Tile.HEIGHT + 50 ? Tile.HEIGHT + 50 :
+				height > 450 ? 500 : height;
+			removedPanel.getTopLevelAncestor().setSize(250, height);
+
+			if (height > 500) {
+				removedPanel.getTopLevelAncestor().revalidate();
+			}
+	}
 	/**
 	 * Removes a specified tile from the game board
 	 *
@@ -447,6 +481,15 @@ public class GamePanel extends JPanel implements MouseListener {
 
 		((MahjongBoard) getTopLevelAncestor()).checkEnabledMenus();
 
+		if (getRemovedTileCount() > 0 && removedPanel != null) {
+			removedPanel.removeAll();
+			for (Tile t: removedTiles) {
+				removedPanel.add(t, 0);
+			}
+			resizeRemovedFrame();
+			removedPanel.revalidate();
+		}
+
 		return true;
 	}
 
@@ -462,6 +505,7 @@ public class GamePanel extends JPanel implements MouseListener {
 
 			((MahjongBoard) getTopLevelAncestor()).checkEnabledMenus();
 
+			resizeRemovedFrame();
 		} catch (EmptyStackException e) {
 			System.err.println("No more redos");
 		}
@@ -665,7 +709,8 @@ public class GamePanel extends JPanel implements MouseListener {
 				removeTile(selectedTile);
 				((MahjongBoard) getTopLevelAncestor()).checkEnabledMenus();
 				if (board.size() == 0) {
-					Fireworks fireworks = new Fireworks(this);
+					fireworks = new Fireworks(this);
+					fireworks.setSound(sound);
 					fireworks.fire();
 				}
 				if (!hint(false)) {
@@ -695,14 +740,21 @@ public class GamePanel extends JPanel implements MouseListener {
 		}
 	}
 
-	protected JScrollPane getRemovedPanel() {
-		JPanel removedPanel = new JPanel();
-		removedPanel.setLayout(new GridLayout(removedTiles.size() / 2, 2));
-		for (Tile tile: removedTiles) {
-			removedPanel.add(tile);
+	protected void stopFireworks() {
+		if (fireworks != null) {
+			fireworks.stop();
+			fireworks = null;
 		}
-		JScrollPane pane = new JScrollPane(removedPanel);
+	}
 
-		return pane;
+	protected JPanel getRemovedPanel() {
+		if (removedPanel == null) {
+			GridLayout layout = new GridLayout(0, 2, 5, 5);
+			removedPanel = new JPanel(layout);
+			for (Tile tile: removedTiles) {
+				removedPanel.add(tile, 0);
+			}
+		}
+		return removedPanel;
 	}
 }

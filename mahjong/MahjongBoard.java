@@ -1,5 +1,3 @@
-
-
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -15,6 +13,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
 
@@ -34,7 +33,8 @@ public class MahjongBoard extends JFrame {
 
 	private final String title = "Marsh-jong: \t";
 
-	private static JFrame removedFrame = new JFrame();
+	private static JFrame removedFrame = null;
+	private static JMenuItem removedTilesItem = null;
 
 	public MahjongBoard() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -183,9 +183,25 @@ public class MahjongBoard extends JFrame {
 		});
 		menu.add(item);
 
+		item = new JCheckBoxMenuItem("Sound");
+		((JCheckBoxMenuItem) item).setSelected(true);
+		item.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (!(e.getSource() instanceof JCheckBoxMenuItem)) {
+					return;
+				}
+
+				JCheckBoxMenuItem checkbox = (JCheckBoxMenuItem) e.getSource();
+				gamePanel.setSound(checkbox.isSelected());
+			}
+		});
+		menu.add(item);
+
 		menu.addSeparator();
 
 		item = new JMenuItem("High Scores");
+		item.setEnabled(false);
 		item.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -194,29 +210,18 @@ public class MahjongBoard extends JFrame {
 		});
 		menu.add(item);
 
-//		item = new JMenuItem("Removed Tiles");
-		item = new JCheckBoxMenuItem("Removed Tiles");
-		item.addActionListener(new ActionListener() {
+		removedTilesItem = new JMenuItem("Removed Tiles");
+		removedTilesItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (e.getSource().getClass() != JCheckBoxMenuItem.class) {
-					return;
+				if (removedFrame == null) {
+					initRemovedFrame();
 				}
-				JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
-				if (!item.isSelected()) {
-					removedFrame.removeAll();
-//					removedFrame.dispose();
-					removedFrame.setVisible(false);
-					removedFrame.revalidate();
-				}
-				else {
-					removedFrame.setSize(200, 500);
-					removedFrame.add(gamePanel.getRemovedPanel());
-					removedFrame.setVisible(true);
-				}
+				removedFrame.setVisible(true);
+				removedTilesItem.setEnabled(false);
 			}
 		});
-		menu.add(item);
+		menu.add(removedTilesItem);
 
 		menubar.add(menu);
 		setJMenuBar(menubar);
@@ -242,6 +247,17 @@ public class MahjongBoard extends JFrame {
 		setVisible(true);
 	}
 
+	private void initRemovedFrame() {
+		removedFrame = new JFrame("Removed Tiles");
+		JScrollPane scrollPane = new JScrollPane(gamePanel.getRemovedPanel());
+		removedFrame.add(scrollPane);
+		removedFrame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				removedTilesItem.setEnabled(true);
+			}
+		});
+		gamePanel.resizeRemovedFrame();
+	}
 	/**
 	 * Calls up a dialog to check what action the user wants to perform after
 	 * the last possible tile set is removed
@@ -254,6 +270,7 @@ public class MahjongBoard extends JFrame {
 				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
 				null, options, options[0]);
 
+		gamePanel.stopFireworks();
 		switch (selection) {
 		case 0:
 			newGame();
