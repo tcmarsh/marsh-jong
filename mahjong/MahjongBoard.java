@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,7 +12,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
 
@@ -30,9 +33,38 @@ public class MahjongBoard extends JFrame {
 	private final int SAVE_INDEX = HINT_INDEX + 2;
 
 	private final String title = "Marsh-jong: \t";
+	private final String operationString = "This help text describes the operation of the MahJong game. \n" +
+			"FILE MENU:\n" +
+			"\tNew Game: Starts a new game\n" +
+			"\tNew Numbered Game: Starts a specific game with the number given by the user - the number for any given game can be found in the title bar while the game is in play.\n" +
+			"\tRestart: Restarts the current game without retaining any memory of redo or undo operations.\n" +
+			"\tUndo/Redo: Performs one undo or redo operation, if available.\n" +
+			"\tSave Game: Not yet implemented.\n" +
+			"\tExit Game: Closes the game and exits.\n\n" +
+			"OPTIONS MENU:\n" +
+			"\tRounded Corners: Sets whether the tiles will be square or have rounded corners.\n" +
+			"\tSound: Sets the sound on or off.\n" +
+			"\tHigh Scores: Displays the high scores.\n" +
+			"\tRemoved Tiles: Displays the window with the tiles that have been removed. This menu is disabled while the panel is visible. Close it to re-enable.\n\n";
+	private final String rulesString = "This help text describes the rules of MahJong.\n\n" +
+			"Click on any tile to highlight it. When one tile is highlighted, clicking" +
+			"on another tile will check to see if they are a match. If the tiles are a" +
+			"match, the tiles will be removed. The following are the types of tiles:\n\n" +
+			"\tCircle tiles - match the same number of circles on a tile\n" +
+			"\tBamboo tiles - match the same number of bamboo on a tile, the one bamboo tile has a picture of a bird\n" +
+			"\tCharacter tiles - Chinese number symbols, match the same number on tiles to remove\n" +
+			"\tFlower tiles - pictures of flowers, match any of them to remove\n" +
+			"\tSeason tiles - match any of butterfly, sun, snowflake and leaf to remove\n\n" +
+			"After any tile has been removed, it will show in the removed panel if you" +
+			"choose to display it. Undo and Redo operations are available and will either" +
+			"replace or re-remove a tile from the board. The hint button will highlight" +
+			"a possible choice, but the use of the hint will disqualify the current game" +
+			"for the purpose of high scores. If you remove all tiles, you get a surprise!\n\n" +
+			"GOOD LUCK!";
 
-	private static JFrame removedFrame = null;
-	private static JMenuItem removedTilesItem = null;
+	private JFrame removedFrame = null;
+	private JMenuItem removedTilesItem = null;
+	private JFrame helpFrame = new JFrame();
 
 	public MahjongBoard() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -180,8 +212,9 @@ public class MahjongBoard extends JFrame {
 		menu = new JMenu("Options");
 		menu.setMnemonic(KeyEvent.VK_O);
 
-		item = new JMenuItem("Rounded Corners");
+		item = new JCheckBoxMenuItem("Rounded Corners");
 		item.setMnemonic(KeyEvent.VK_R);
+		((JCheckBoxMenuItem) item).setSelected(true);
 		item.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -233,6 +266,62 @@ public class MahjongBoard extends JFrame {
 		menubar.add(menu);
 		setJMenuBar(menubar);
 
+		menu = new JMenu("Help");
+		menu.setMnemonic(KeyEvent.VK_H);
+
+		item = new JMenuItem("Operation");
+		item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+		item.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JPanel panel = new JPanel();
+				JTextArea text = new JTextArea();
+				JScrollPane scrollPane = new JScrollPane(text);
+				text.setText(operationString);
+				text.setLineWrap(true);
+				text.setWrapStyleWord(true);
+				text.setTabSize(2);
+				scrollPane.setPreferredSize(new Dimension(550, 350));
+				panel.add(scrollPane);
+				helpFrame.setTitle("Operation Instructions");
+				helpFrame.add(panel);
+				helpFrame.setVisible(true);
+				helpFrame.setSize(600, 400);
+			}
+		});
+		menu.add(item);
+		item = new JMenuItem("Game Rules");
+		item.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JPanel panel = new JPanel();
+				JTextArea text = new JTextArea();
+				JScrollPane scrollPane = new JScrollPane(text);
+				text.setText(rulesString);
+				text.setLineWrap(true);
+				text.setWrapStyleWord(true);
+				text.setTabSize(2);
+				scrollPane.setPreferredSize(new Dimension(550, 350));
+				panel.add(scrollPane);
+				helpFrame.setTitle("Game Rules");
+				helpFrame.add(panel);
+				helpFrame.setVisible(true);
+				helpFrame.setSize(600, 400);
+			}
+		});
+		menu.add(item);
+
+		menubar.add(menu);
+
+		helpFrame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				helpFrame.dispose();
+				helpFrame = new JFrame();
+				helpFrame.addWindowListener(this);
+			}
+		});
+
 		add(gamePanel);
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -250,7 +339,7 @@ public class MahjongBoard extends JFrame {
 			}
 		});
 
-		setTitle(title + gamePanel.gameNumber);
+	setTitle(title + gamePanel.gameNumber);
 		setResizable(false);
 		setVisible(true);
 	}

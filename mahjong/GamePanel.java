@@ -1,6 +1,3 @@
-
-
-
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.GridLayout;
@@ -432,7 +429,8 @@ public class GamePanel extends JPanel implements MouseListener {
 	}
 
 	protected void resizeRemovedFrame() {
-			int height = getRemovedTileCount() * (Tile.HEIGHT + 120 / getRemovedTileCount()) / 2 + 50;
+			int tileCount = getRemovedTileCount() <= 0 ? 1 : getRemovedTileCount();
+			int height = tileCount * (Tile.HEIGHT + 120 / tileCount) / 2 + 50;
 			height = height < Tile.HEIGHT + 50 ? Tile.HEIGHT + 50 :
 				height > 450 ? 500 : height;
 			removedPanel.getTopLevelAncestor().setSize(250, height);
@@ -762,7 +760,7 @@ public class GamePanel extends JPanel implements MouseListener {
 		}
 		return removedPanel;
 	}
-	
+
 	protected boolean allowHint(Container parent) {
 		if (!initHint) {
 			int selection = JOptionPane.showConfirmDialog(parent,
