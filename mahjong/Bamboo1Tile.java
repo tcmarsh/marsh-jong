@@ -6,12 +6,11 @@ public class Bamboo1Tile extends PictureTile {
 	public Bamboo1Tile()
 	{
 		super("Sparrow");
-		System.exit(-1);
+		System.out.println("test");
 	}
 
 	public String toString()
 	{
-		System.out.println("test");
 		return "Bamboo 1";
 	}
 }
