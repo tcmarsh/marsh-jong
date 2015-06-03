@@ -422,7 +422,7 @@ public class MahjongBoard extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		MahjongBoard mahjongBoard = new MahjongBoard();
+		new MahjongBoard();
 	}
 
 }
